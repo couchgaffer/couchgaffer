@@ -49,7 +49,9 @@ A gameweek ([`sim/gameweek.py`](backend/watchparty/sim/gameweek.py)) builds thre
 | Foundry IQ (Azure AI Search knowledge base): the league rulebook the summaries cite | [`knowledge.py`](backend/watchparty/knowledge.py), [`tools/foundry_iq.py`](backend/tools/foundry_iq.py) |
 | Azure Container Apps, and a Container Apps Job for the recaps, triggered by Azure Storage queues; recaps in Blob Storage | [`infra/main.bicep`](infra/main.bicep), [`recap/`](backend/watchparty/recap/) |
 | The app signs in with managed identities; it holds no keys | [`infra/README.md`](infra/README.md) |
-| Azure Monitor (Log Analytics) | [`infra/main.bicep`](infra/main.bicep) |
+| Azure Managed Redis: shared live state, so two replicas serve every screen | [`app/shared.py`](backend/watchparty/app/shared.py) |
+| Azure Database for PostgreSQL: leagues, squads and seasons | [`store/`](backend/watchparty/store/) |
+| Azure Monitor: Log Analytics, and Application Insights traces with no prompts, answers or names | [`infra/main.bicep`](infra/main.bicep), [`telemetry.py`](backend/watchparty/telemetry.py) |
 
 ## Does the multi-agent design earn its place?
 

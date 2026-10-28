@@ -8,7 +8,7 @@ How Couch Gaffer turns one synthetic match into five personal stories, one share
 flowchart TB
   V["Screens in the browser<br/>group screen and phone views (or a phone via QR)"]
 
-  subgraph CA["Azure Container App ca-watchparty: one replica, 0.5 CPU, 1 GiB"]
+  subgraph CA["Azure Container App ca-watchparty: two replicas, 0.5 CPU and 1 GiB each"]
     API["FastAPI: REST /api and WebSocket /ws<br/>serves the React app"]
     SIM["Simulator<br/>seeded synthetic match"]
     PTS["Points engine<br/>stakes, evidence ids, per-friend facts"]
@@ -31,6 +31,8 @@ flowchart TB
   end
 
   V <-->|"frames, events, cues, decisions"| API
+  API <-->|"seats, hourly limits, screens on the other replica"| RD["Azure Managed Redis"]
+  API <-->|"leagues, squads, seasons"| PG["Azure Database for PostgreSQL"]
   API --> SIM --> PTS
   PTS -->|"stat cards at once"| CUE
   PTS --> WF
@@ -136,7 +138,7 @@ The match never waits on a model. Each fallback is built by code from the same e
 | The recap job fails or is late | No link; the match is unaffected | [`recap/dispatch.py`](../backend/watchparty/recap/dispatch.py) |
 | No Foundry endpoint is configured | Every match runs on code alone, and `/health` says so | [`app/main.py`](../backend/watchparty/app/main.py) |
 
-A timeout, an error or a second failed check is logged as a warning with its cause, so a sign-in or quota failure does not look like the design working (spans are marked as errors too, but traces are not exported in this version) ([`app/workflow.py`](../backend/watchparty/app/workflow.py) `fell_back`). A summary's log line names the cause: a timeout, failed checks with the problems, a match tools error, or a model or API error. Agent Framework hands a failed tool call back to the model as a plain error and carries on, so a middleware records each failed tool call and the summary's log line names it first ([`agents/foundry.py`](../backend/watchparty/agents/foundry.py) `record_tool_failures`, [`app/session.py`](../backend/watchparty/app/session.py) `why_summary_fell_back`).
+A timeout, an error or a second failed check is logged as a warning with its cause, so a sign-in or quota failure does not look like the design working (spans are marked as errors too, and go to Application Insights when the app has its connection string) ([`app/workflow.py`](../backend/watchparty/app/workflow.py) `fell_back`). A summary's log line names the cause: a timeout, failed checks with the problems, a match tools error, or a model or API error. Agent Framework hands a failed tool call back to the model as a plain error and carries on, so a middleware records each failed tool call and the summary's log line names it first ([`agents/foundry.py`](../backend/watchparty/agents/foundry.py) `record_tool_failures`, [`app/session.py`](../backend/watchparty/app/session.py) `why_summary_fell_back`).
 
 The "knock out" control on the judge's page skips one manager's agent on purpose, the judge's own included, the next time that agent bids: that phone gets the plain stat from code, while the other agents and the host run as usual. It stays armed through moments where that manager has nothing at stake. Each press gets an arm id, and the decision of the moment that spends it carries `knocked_out` with that id, so the page clears its label only when the server has used that press. `POST /api/sessions/{id}/chaos` without a manager still sends every agent on the next moment with agents in it to the code fallbacks ([`app/session.py`](../backend/watchparty/app/session.py) `simulate_failure`, [`app/workflow.py`](../backend/watchparty/app/workflow.py) `ManagerStep`).
 
@@ -188,22 +190,25 @@ The demo is a public link with no sign-in, so the session store caps what anyone
 
 | Resource | Role |
 |---|---|
-| Container App `ca-watchparty` | The app: API, WebSockets, simulator, agents, MCP tools and the built front end. One replica, HTTPS only |
+| Container App `ca-watchparty` | The app: API, WebSockets, simulator, agents, MCP tools and the built front end. Two replicas, HTTPS only |
+| Azure Managed Redis | Shared live state, so either replica can serve any screen: which replica runs each match, the hourly limits, and presses forwarded to that replica ([`app/shared.py`](../backend/watchparty/app/shared.py)). Entra sign-in, access keys off |
+| Azure Database for PostgreSQL, North Europe | Leagues, members, squads and season results ([`store/`](../backend/watchparty/store/)). Entra sign-in, password auth off |
+| Application Insights `appi-watchparty` | Traces from the app and the recap job, with no prompts, answers or names ([`telemetry.py`](../backend/watchparty/telemetry.py)); stored in `log-watchparty` |
 | Container Apps environment `cae-watchparty` | Consumption plan; sends all its log categories to Log Analytics |
 | Container App Job `caj-watchparty-recap` | Recap renderer, started by the storage queue, up to 5 runs at once |
 | Container registry `watchpartyd4d84f` | App and recap images, tagged with the commit, and with the release version when deployed by script; admin user off |
 | Azure AI Foundry account and project | `gpt-5.4-mini` for every agent; `gpt-4.1-mini` deployed as the tested runner-up ([`docs/decisions/0001-models.md`](decisions/0001-models.md)) |
 | Azure AI Search (Foundry IQ), France Central | Rulebook index for rule explanations; Sweden Central takes no new search services |
 | Storage account | Recap bundles and videos, and the job queue; no public blob access, no shared keys, recaps deleted after 30 days |
-| Log Analytics `log-watchparty` | The environment's logs, 30 days, 1 GB daily cap |
-| Managed identities | One each for the app, the recap job and deploys, plus the search service's own identity for planning queries with the model. No keys or connection strings anywhere: Foundry, Search and Storage all have key access switched off |
+| Log Analytics `log-watchparty` | The environment's logs and the Application Insights traces, 30 days, 1 GB daily cap |
+| Managed identities | One each for the app, the recap job and deploys, plus the search service's own identity for planning queries with the model. No keys or passwords anywhere: Foundry, Search, Storage and Redis have key access switched off, PostgreSQL password sign-in is off, and the Application Insights connection string sends nothing without Entra sign-in (local auth off) |
 
 Everything above is one Bicep template, [`infra/main.bicep`](../infra/main.bicep), except the Foundry account, its project and its deployments, which the template references ([`infra/README.md`](../infra/README.md) says why).
 
 Each identity holds only what it needs:
 
-- **App:** pull its image, call the models, read the rulebook, read and write the recaps container, send queue messages, and sign read-only recap links.
-- **Recap job:** pull its image, read and write the recaps container, and take and delete messages on the recaps queue.
+- **App:** pull its image, call the models, read the rulebook, read and write the recaps container, send queue messages, sign read-only recap links, use Redis, sign in to PostgreSQL as its Entra administrator, and publish traces.
+- **Recap job:** pull its image, read and write the recaps container, take and delete messages on the recaps queue, and publish traces.
 - **Deploy:** push images, update the app and the job, and read and join their environment through a custom role. It signs in only from `main`, and cannot assign roles or touch Foundry or storage.
 
 ## Delivery
@@ -222,19 +227,12 @@ flowchart LR
 
 - `develop` is the integration branch. `main` holds only releases: a `release/X.Y.Z` branch merged with a merge commit and tagged `vX.Y.Z` ([`infra/README.md`](../infra/README.md), Deploying; [`CHANGELOG.md`](../CHANGELOG.md)). A pre-push hook refuses pushes to `main`, `develop` and release tags unless the integrator sets an override ([`.githooks/pre-push`](../.githooks/pre-push)).
 - CI runs on every pull request and every push to `main` ([`.github/workflows/ci.yml`](../.github/workflows/ci.yml)).
-- A deploy restarts the single replica and ends every live match, so nothing deploys on a merge. The deploy workflow runs only when started by hand on `main` ([`.github/workflows/deploy.yml`](../.github/workflows/deploy.yml)), and [`scripts/deploy.sh`](../scripts/deploy.sh) does the same from a laptop after `make check`. Both refuse any commit that is not the tip of `main` on origin with exactly one `vX.Y.Z` tag there ([`scripts/release_tag.sh`](../scripts/release_tag.sh)).
+- A deploy replaces both replicas and ends every live match, so nothing deploys on a merge. The deploy workflow runs only when started by hand on `main` ([`.github/workflows/deploy.yml`](../.github/workflows/deploy.yml)), and [`scripts/deploy.sh`](../scripts/deploy.sh) does the same from a laptop after `make check`. Both refuse any commit that is not the tip of `main` on origin with exactly one `vX.Y.Z` tag there ([`scripts/release_tag.sh`](../scripts/release_tag.sh)).
 - The deploy waits for the new revision to be healthy and serving the image just pushed before the smoke, so the smoke cannot pass against the old revision. If anything after the roll fails, or the run is stopped, both the app and the job go back to the images they ran before ([`infra/README.md`](../infra/README.md), Deploying).
 - GitHub Actions signs in to Azure with a short-lived OIDC token for one managed identity. No Azure secret is stored in GitHub. The daily smoke needs no Azure access at all ([`.github/workflows/smoke.yml`](../.github/workflows/smoke.yml)).
 - The smoke plays a whole match on the live site and fails without group-screen decisions, an explanation and a summary written by an agent, all ten summaries, a rulebook citation, Spanish text from an agent with its English copy, and all five recap links serving video ([`backend/tools/smoke.py`](../backend/tools/smoke.py)).
 
 ## Limits today
 
-- **One replica.** A live match is a running task in the server's memory, so a deploy or a crash ends the matches in progress, and every visitor shares one 0.5 CPU container ([`infra/main.bicep`](../infra/main.bicep)).
+- **A match lives on one replica.** It runs as a task in the memory of the replica that created it; Redis lets a screen on the other replica watch and press it, but a deploy or a crash of that replica ends its matches. Two replicas come from `scripts/apply-infra.sh --wire` (`appReplicas=2`); the template's default is one ([`infra/main.bicep`](../infra/main.bicep)).
 - **Synthetic matches only.** Clubs, players and managers are invented; real match data would need a licensed feed.
-
-## Not in this version
-
-- Shared live state in Redis for several replicas
-- Leagues, squads and seasons in PostgreSQL
-- Traces exported to Application Insights
-- Manager angles and declined bids (the contracts define a declined bid; nothing sends one yet)
