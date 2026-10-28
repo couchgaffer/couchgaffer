@@ -1,0 +1,6 @@
+{
+  "seq": 409, "t": 2528000, "type": "pass", "team": "home", "player": "p_home_8",
+  "x": 0.62, "y": 0.30, "end_x": 0.84, "end_y": 0.38, "receiver": "p_home_9", "outcome": "success",
+  "pass": { "distance_m": 23.4, "difficulty": 0.7, "progressive": true, "ball_speed_km_h": 61 },
+  "moment_id": "m_07", "scenario": "counterattack"
+}

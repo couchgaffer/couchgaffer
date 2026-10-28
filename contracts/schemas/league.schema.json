@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "league.schema.json",
+  "title": "League",
+  "description": "The mini-league for one session: five managers, one played by the viewer and four bots. Free to play; no stakes, prizes or wagering.",
+  "type": "object",
+  "required": ["league_id", "name", "scoring_rules_version", "managers"],
+  "additionalProperties": false,
+  "properties": {
+    "league_id": { "type": "string", "pattern": "^lg_[a-z0-9_]+$" },
+    "name": { "type": "string", "maxLength": 40 },
+    "scoring_rules_version": { "type": "string", "pattern": "^v[0-9]+$" },
+    "managers": {
+      "type": "array",
+      "minItems": 5,
+      "maxItems": 5,
+      "items": {
+        "type": "object",
+        "required": ["id", "display_name", "is_bot", "style", "lang", "squad", "captain", "points"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "$ref": "common.schema.json#/$defs/managerId" },
+          "display_name": { "type": "string", "maxLength": 20 },
+          "is_bot": { "type": "boolean" },
+          "style": { "$ref": "common.schema.json#/$defs/style" },
+          "lang": { "$ref": "common.schema.json#/$defs/lang" },
+          "favourite_club": { "$ref": "common.schema.json#/$defs/teamId" },
+          "squad": {
+            "description": "Players this manager owns in this match. The captain must be one of them.",
+            "type": "array",
+            "minItems": 4,
+            "maxItems": 6,
+            "uniqueItems": true,
+            "items": { "$ref": "common.schema.json#/$defs/playerId" }
+          },
+          "captain": { "$ref": "common.schema.json#/$defs/playerId" },
+          "points": { "description": "Impact points before kick-off: the league standing.", "type": "number" }
+        }
+      }
+    }
+  }
+}

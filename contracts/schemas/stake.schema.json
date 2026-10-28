@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "stake.schema.json",
+  "title": "Stake",
+  "description": "What one key moment means for one manager, computed by the points engine. Deterministic: the only source of numbers for the agents.",
+  "type": "object",
+  "required": ["moment_id", "manager", "t", "delta_points", "total_points", "reason_code", "above_threshold", "evidence"],
+  "additionalProperties": false,
+  "properties": {
+    "moment_id": { "$ref": "common.schema.json#/$defs/momentId" },
+    "fixture_id": { "$ref": "common.schema.json#/$defs/fixtureId" },
+    "manager": { "$ref": "common.schema.json#/$defs/managerId" },
+    "t": { "$ref": "common.schema.json#/$defs/matchTimeMs" },
+    "delta_points": { "description": "Impact points this moment adds or removes, captain multiplier included.", "type": "number" },
+    "total_points": { "description": "League total after this moment.", "type": "number" },
+    "rank_before": { "type": "integer", "minimum": 1, "maximum": 5},
+    "rank_after": { "type": "integer", "minimum": 1, "maximum": 5},
+    "players": { "type": "array", "items": { "$ref": "common.schema.json#/$defs/playerId" }},
+    "reason_code": {
+      "description": "Which scoring rule fired, for example save_tier_reached.",
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*$"
+    },
+    "milestone": {
+      "description": "Progress towards the next tier, for 'one more save' style lines.",
+      "type": "object",
+      "required": ["name", "progress", "target"],
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" },
+        "progress": { "type": "number", "minimum": 0},
+        "target": { "type": "number", "exclusiveMinimum": 0}
+      }
+    },
+    "above_threshold": { "description": "True if this manager's agent should be called for this moment.", "type": "boolean" },
+    "evidence": { "type": "array", "minItems": 1, "items": { "$ref": "common.schema.json#/$defs/evidence" }},
+    "facts": {
+      "description": "What the moment means for this manager beyond the points (#87). Fact ids are unique within a stake, and every evidence id a fact cites is in this stake's evidence; the points engine guarantees both. rank_change is emitted only when the position changed.",
+      "type": "array",
+      "items": { "$ref": "common.schema.json#/$defs/fact" }
+    }
+  }
+}

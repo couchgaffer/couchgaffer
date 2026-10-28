@@ -1,0 +1,17 @@
+{
+  "league_id": "lg_demo_gw",
+  "name": "Sunday Sofa League",
+  "scoring_rules_version": "v1",
+  "managers": [
+    { "id": "mgr_1", "display_name": "Jo", "is_bot": false, "style": "casual", "lang": "en", "favourite_club": "t_hollinsford",
+      "squad": ["p_hol_9", "p_kes_9", "p_rav_10", "p_hol_1", "p_gri_8"], "captain": "p_hol_9", "points": 212 },
+    { "id": "mgr_2", "display_name": "Priya", "is_bot": true, "style": "analyst", "lang": "en", "favourite_club": "t_saltmere",
+      "squad": ["p_sal_1", "p_pel_9", "p_sal_9", "p_kes_7", "p_rav_9"], "captain": "p_sal_1", "points": 218 },
+    { "id": "mgr_3", "display_name": "Arjun", "is_bot": true, "style": "casual", "lang": "en", "favourite_club": "t_grindlestone",
+      "squad": ["p_hol_9", "p_gri_9", "p_pel_10", "p_sal_11", "p_kes_2"], "captain": "p_gri_9", "points": 205 },
+    { "id": "mgr_4", "display_name": "Leo", "is_bot": true, "style": "analyst", "lang": "es", "favourite_club": "t_kestlebury",
+      "squad": ["p_kes_9", "p_hol_7", "p_rav_6", "p_gri_1", "p_pel_9"], "captain": "p_kes_9", "points": 209 },
+    { "id": "mgr_5", "display_name": "Sam", "is_bot": true, "style": "casual", "lang": "en", "favourite_club": "t_ravensholme",
+      "squad": ["p_sal_9", "p_kes_9", "p_rav_9", "p_pel_4", "p_hol_6"], "captain": "p_sal_9", "points": 199 }
+  ]
+}

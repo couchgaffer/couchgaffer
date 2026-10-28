@@ -1,0 +1,102 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  contracts:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@07a047e608db84b3d8c06cd9a7c7dcc9c355c18e # v10.3.2
+        with:
+          version: "0.10.6"
+      - run: uv run --no-project --with jsonschema==4.26.0 python contracts/validate.py
+
+  backend:
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: backend
+    # The league store's tests (#96) run against a throwaway Postgres; without TEST_DATABASE_URL they skip.
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: test
+        ports: ["5432:5432"]
+        options: --health-cmd pg_isready --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      TEST_DATABASE_URL: postgresql://postgres:test@127.0.0.1:5432/postgres
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@07a047e608db84b3d8c06cd9a7c7dcc9c355c18e # v10.3.2
+        with:
+          version: "0.10.6"
+      - run: uv sync --locked # fails if uv.lock does not match pyproject.toml (#28)
+      - name: Install ffmpeg, so the recap render tests run (in CI they fail rather than skip, #29)
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends ffmpeg fonts-dejavu-core
+      - name: Generated models match contracts/
+        run: uv run datamodel-codegen && git diff --exit-code -- watchparty/models
+      - run: uv run ruff check .
+      - run: uv run ruff format --check .
+      - run: uv run mypy watchparty tests tools
+      - run: uv run pytest
+
+  frontend:
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+      - run: npm ci --ignore-scripts
+      - name: Generated types match contracts/
+        run: npm run gen:types && git diff --exit-code -- src/types
+      - run: npm audit --audit-level=high
+      - run: npm test
+      - run: npm run build
+
+  image:
+    needs: [backend, frontend]
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - run: docker build -t watchparty:ci .
+      - run: docker build --target recap -t watchparty-recap:ci . # the recap job's image, first built here (#29)
+      - name: Container serves /health
+        run: |
+          docker run -d --name app -p 8000:8000 --read-only --tmpfs /tmp --cap-drop ALL watchparty:ci
+          for i in $(seq 20); do curl -fsS localhost:8000/health && exit 0; sleep 1; done
+          docker logs app; exit 1
+
+  secrets:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: gitleaks/gitleaks-action@e0c47f4f8be36e29cdc102c57e68cb5cbf0e8d1e # v3.0.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

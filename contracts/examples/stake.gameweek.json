@@ -1,0 +1,216 @@
+{
+  "moment_id": "m_09",
+  "manager": "mgr_2",
+  "t": 2534000,
+  "delta_points": 12,
+  "total_points": 240,
+  "rank_before": 2,
+  "rank_after": 1,
+  "players": [
+    "p_kes_9"
+  ],
+  "reason_code": "goal",
+  "above_threshold": true,
+  "evidence": [
+    {
+      "id": "ev_m_09_minute",
+      "label": "Match minute",
+      "value": 43,
+      "source": {
+        "kind": "event",
+        "event_seq": [
+          1235
+        ]
+      },
+      "unit": "minute"
+    },
+    {
+      "id": "ev_m_09_xg",
+      "label": "xG of the shot",
+      "value": 0.31,
+      "source": {
+        "kind": "event",
+        "event_seq": [
+          1235
+        ]
+      },
+      "unit": "xg"
+    },
+    {
+      "id": "ev_m_09_mgr_2_p_kes_9_shot_on_target",
+      "label": "Benji Cortland, shot on target, captain x2",
+      "value": 2,
+      "unit": "ip",
+      "source": {
+        "kind": "computed",
+        "formula": "shot_on_target@v1",
+        "event_seq": [
+          1235
+        ]
+      }
+    },
+    {
+      "id": "ev_m_09_mgr_2_p_kes_9_goal",
+      "label": "Benji Cortland, goal, captain x2",
+      "value": 10,
+      "unit": "ip",
+      "source": {
+        "kind": "computed",
+        "formula": "goal@v1",
+        "event_seq": [
+          1235
+        ]
+      }
+    },
+    {
+      "id": "ev_m_09_mgr_2_delta",
+      "label": "Impact points from this moment",
+      "value": 12,
+      "unit": "ip",
+      "source": {
+        "kind": "computed",
+        "formula": "moment_delta@v1",
+        "event_seq": [
+          1235
+        ]
+      }
+    },
+    {
+      "id": "ev_m_09_mgr_2_total",
+      "label": "League total after this moment",
+      "value": 240,
+      "unit": "ip",
+      "source": {
+        "kind": "computed",
+        "formula": "league_total@v1"
+      }
+    },
+    {
+      "id": "ev_m_09_mgr_2_rank_before",
+      "label": "League rank before",
+      "value": 2,
+      "unit": "count",
+      "source": {
+        "kind": "computed",
+        "formula": "rank@v1"
+      }
+    },
+    {
+      "id": "ev_m_09_mgr_2_rank_after",
+      "label": "League rank after",
+      "value": 1,
+      "unit": "count",
+      "source": {
+        "kind": "computed",
+        "formula": "rank@v1"
+      }
+    },
+    {
+      "id": "ev_m_09_p_kes_9_owners",
+      "label": "Managers in the league who own Benji Cortland",
+      "value": 1,
+      "unit": "count",
+      "source": {
+        "kind": "computed",
+        "formula": "ownership@v1",
+        "event_seq": [
+          1235
+        ]
+      }
+    },
+    {
+      "id": "ev_m_09_p_kes_9_xg_so_far",
+      "label": "xG of Benji Cortland's shots so far",
+      "value": 0.31,
+      "unit": "xg",
+      "source": {
+        "kind": "computed",
+        "formula": "player_xg_sum@v1",
+        "event_seq": [
+          1235
+        ]
+      }
+    },
+    {
+      "id": "ev_m_09_p_kes_9_expected_ip",
+      "label": "Goal IP expected from Benji Cortland's xG",
+      "value": 1.55,
+      "unit": "ip",
+      "source": {
+        "kind": "computed",
+        "formula": "expected_goal_ip@v1",
+        "event_seq": [
+          1235
+        ]
+      }
+    },
+    {
+      "id": "ev_m_09_p_kes_9_actual_ip",
+      "label": "Goal IP scored by Benji Cortland",
+      "value": 5,
+      "unit": "ip",
+      "source": {
+        "kind": "computed",
+        "formula": "goal_ip@v1",
+        "event_seq": [
+          1235
+        ]
+      }
+    },
+    {
+      "id": "ev_m_09_mgr_2_elsewhere",
+      "label": "Impact points from the other matches so far",
+      "value": 6,
+      "unit": "ip",
+      "source": {
+        "kind": "computed",
+        "formula": "elsewhere@v1"
+      }
+    }
+  ],
+  "fixture_id": "fx_2",
+  "facts": [
+    {
+      "id": "f_m_09_mgr_2_differential_p_kes_9",
+      "kind": "differential",
+      "player": "p_kes_9",
+      "owners": 1,
+      "evidence_ids": [
+        "ev_m_09_p_kes_9_owners",
+        "ev_m_09_mgr_2_p_kes_9_shot_on_target",
+        "ev_m_09_mgr_2_p_kes_9_goal"
+      ]
+    },
+    {
+      "id": "f_m_09_mgr_2_rank_change",
+      "kind": "rank_change",
+      "rank_before": 2,
+      "rank_after": 1,
+      "evidence_ids": [
+        "ev_m_09_mgr_2_rank_before",
+        "ev_m_09_mgr_2_rank_after"
+      ]
+    },
+    {
+      "id": "f_m_09_mgr_2_expected_vs_actual_p_kes_9",
+      "kind": "expected_vs_actual",
+      "player": "p_kes_9",
+      "xg": 0.31,
+      "expected_points": 1.55,
+      "actual_points": 5,
+      "evidence_ids": [
+        "ev_m_09_p_kes_9_xg_so_far",
+        "ev_m_09_p_kes_9_expected_ip",
+        "ev_m_09_p_kes_9_actual_ip"
+      ]
+    },
+    {
+      "id": "f_m_09_mgr_2_elsewhere",
+      "kind": "elsewhere",
+      "points": 6,
+      "evidence_ids": [
+        "ev_m_09_mgr_2_elsewhere"
+      ]
+    }
+  ]
+}

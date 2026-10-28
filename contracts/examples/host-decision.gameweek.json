@@ -1,0 +1,8 @@
+{
+  "moment_id": "m_09", "fixture_id": "fx_2", "t": 2534000, "chosen_manager": "mgr_2", "source": "scorer", "close_call": false,
+  "scores": [
+    { "manager": "mgr_2", "score": 0.91, "airtime_share": 0.2, "overruled_count": 0 },
+    { "manager": "mgr_4", "score": 0.35, "airtime_share": 0.3, "overruled_count": 1 }
+  ],
+  "latency_ms": 12
+}

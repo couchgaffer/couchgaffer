@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "gameweek.schema.json",
+  "title": "Gameweek",
+  "description": "Sent once when a gameweek session starts, in place of meta (#94). Every fixture plays on one clock, from t = 0. The session guarantees what the schema cannot: fixture ids are unique within a gameweek, and each fixture's speed and playback_delay_ms equal the gameweek's.",
+  "type": "object",
+  "required": ["gameweek_id", "seed", "speed", "fixtures"],
+  "additionalProperties": false,
+  "properties": {
+    "gameweek_id": { "type": "string", "pattern": "^gw_[a-z0-9_]+$" },
+    "seed": { "type": "integer", "minimum": 0 },
+    "speed": { "description": "Match seconds per real second, for every fixture.", "type": "number", "exclusiveMinimum": 0 },
+    "playback_delay_ms": {
+      "description": "Real milliseconds the screens run behind the simulator.",
+      "type": "integer",
+      "minimum": 0
+    },
+    "fixtures": {
+      "description": "The three fixtures' MatchMeta, each with its fixture_id set. The JSON Schema requires fixture_id here; the generated pydantic and TypeScript types do not.",
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "items": { "allOf": [{ "$ref": "match-meta.schema.json" }, { "required": ["fixture_id"] }] }
+    }
+  }
+}

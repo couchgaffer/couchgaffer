@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "match-frame.schema.json",
+  "title": "MatchFrame",
+  "description": "Approximate positions for drawing the pitch, about 10 per real second. The screens interpolate between frames.",
+  "type": "object",
+  "required": ["t", "ball", "players", "possession"],
+  "additionalProperties": false,
+  "properties": {
+    "t": { "$ref": "common.schema.json#/$defs/matchTimeMs" },
+    "fixture_id": { "$ref": "common.schema.json#/$defs/fixtureId" },
+    "possession": { "$ref": "common.schema.json#/$defs/side" },
+    "ball": {
+      "type": "object",
+      "required": ["x", "y"],
+      "additionalProperties": false,
+      "properties": {
+        "x": { "$ref": "common.schema.json#/$defs/unit" },
+        "y": { "$ref": "common.schema.json#/$defs/unit" },
+        "z_m": { "type": "number", "minimum": 0 }
+      }
+    },
+    "players": {
+      "type": "array",
+      "maxItems": 22,
+      "items": {
+        "type": "object",
+        "required": ["id", "x", "y"],
+        "additionalProperties": false,
+        "properties": {
+          "id": { "$ref": "common.schema.json#/$defs/playerId" },
+          "x": { "$ref": "common.schema.json#/$defs/unit" },
+          "y": { "$ref": "common.schema.json#/$defs/unit" }
+        }
+      }
+    }
+  }
+}

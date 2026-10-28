@@ -1,0 +1,14 @@
+{
+  "moment_id": "m_07", "t": 2534000, "chosen_manager": "mgr_1", "source": "host", "close_call": true,
+  "reason": "Close call. Priya has had the screen most tonight; You have been overruled twice.",
+  "because": "most_close_calls_lost",
+  "contenders": [
+    { "manager": "mgr_2", "pitch": "Priya's keeper reaches the Wall tier." },
+    { "manager": "mgr_1", "pitch": "Your captain saved, one off the tier." }
+  ],
+  "scores": [
+    { "manager": "mgr_2", "score": 0.82, "airtime_share": 0.4, "overruled_count": 0 },
+    { "manager": "mgr_1", "score": 0.78, "airtime_share": 0.1, "overruled_count": 2 }
+  ],
+  "latency_ms": 1650
+}

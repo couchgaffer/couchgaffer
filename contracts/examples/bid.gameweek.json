@@ -1,0 +1,7 @@
+{
+  "moment_id": "m_09", "fixture_id": "fx_2", "manager": "mgr_2", "style": "analyst", "lang": "en", "urgency": 0.8,
+  "explanation": "Benji Cortland scores from a 0.31 xG chance: 12 IP with the captain double, on top of 6 IP from the other matches.",
+  "pitch_to_host": "Priya's captain just scored and took her top of the table.",
+  "evidence_ids": ["ev_m_09_xg", "ev_m_09_mgr_2_delta", "ev_m_09_mgr_2_elsewhere"],
+  "status": "ok", "latency_ms": 2140, "model": "manager-fast", "angle": "f_m_09_mgr_2_rank_change"
+}

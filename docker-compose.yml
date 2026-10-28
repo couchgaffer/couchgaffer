@@ -1,0 +1,24 @@
+services:
+  app:
+    build: .
+    ports:
+      - "127.0.0.1:8000:8000"
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+
+  # A recorded session rendered locally (#15):
+  #   docker compose run --rm recap --local /data/input.json.gz /data/out
+  recap:
+    build:
+      context: .
+      target: recap
+    profiles: [recap]
+    volumes:
+      - ./recordings:/data
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    entrypoint: ["python", "-m", "watchparty.recap.worker"]

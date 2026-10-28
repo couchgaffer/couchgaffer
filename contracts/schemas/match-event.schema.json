@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "match-event.schema.json",
+  "title": "MatchEvent",
+  "description": "One synthetic event from the simulator (rule 4.1 stage a). seq is gap-free and strictly increasing per match; in a gameweek, strictly increasing across all its fixtures, so evidence event_seq never needs a fixture (#94).",
+  "type": "object",
+  "required": ["seq", "t", "type", "team", "x", "y"],
+  "additionalProperties": false,
+  "properties": {
+    "seq": { "type": "integer", "minimum": 0 },
+    "fixture_id": { "$ref": "common.schema.json#/$defs/fixtureId" },
+    "t": { "$ref": "common.schema.json#/$defs/matchTimeMs" },
+    "type": {
+      "enum": [
+        "kickoff", "pass", "carry", "dribble", "pressure", "tackle", "interception",
+        "possession_change", "shot", "save", "goal", "foul", "card", "corner",
+        "free_kick", "offside", "substitution", "half_time", "full_time"
+      ]
+    },
+    "team": { "$ref": "common.schema.json#/$defs/side" },
+    "player": { "$ref": "common.schema.json#/$defs/playerId" },
+    "x": { "$ref": "common.schema.json#/$defs/unit" },
+    "y": { "$ref": "common.schema.json#/$defs/unit" },
+    "end_x": { "$ref": "common.schema.json#/$defs/unit" },
+    "end_y": { "$ref": "common.schema.json#/$defs/unit" },
+    "receiver": { "$ref": "common.schema.json#/$defs/playerId" },
+    "opponent": { "description": "The defender, keeper or fouled player involved.", "$ref": "common.schema.json#/$defs/playerId" },
+    "outcome": { "enum": ["success", "fail", "saved", "blocked", "off_target", "woodwork", "goal", "yellow", "red"] },
+    "player_speed_km_h": {
+      "description": "Set when the player passes the speed threshold, for name tagging (rule 4.1 ii).",
+      "type": "number",
+      "minimum": 0
+    },
+    "pass": {
+      "type": "object",
+      "required": ["distance_m", "difficulty", "progressive"],
+      "additionalProperties": false,
+      "properties": {
+        "distance_m": { "type": "number", "minimum": 0 },
+        "difficulty": { "description": "0 easy to 1 hardest.", "type": "number", "minimum": 0, "maximum": 1 },
+        "progressive": { "type": "boolean" },
+        "ball_speed_km_h": { "type": "number", "minimum": 0 }
+      }
+    },
+    "shot": {
+      "type": "object",
+      "required": ["xg", "speed_km_h", "body_part"],
+      "additionalProperties": false,
+      "properties": {
+        "xg": { "type": "number", "minimum": 0, "maximum": 1 },
+        "speed_km_h": { "type": "number", "minimum": 0 },
+        "body_part": { "enum": ["right_foot", "left_foot", "head", "other"] }
+      }
+    },
+    "moment_id": { "description": "Set on every event in a key moment.", "$ref": "common.schema.json#/$defs/momentId" },
+    "climax": { "description": "True on the last event of a key moment. The points engine computes stakes when it sees this.", "type": "boolean" },
+    "scenario": {
+      "enum": ["build_up", "counterattack", "high_press", "set_piece", "low_block", "keeper_save_run", "late_equaliser", "filler"]
+    }
+  },
+  "allOf": [
+    { "if": { "properties": { "type": { "const": "pass" } } }, "then": { "required": ["player", "pass", "end_x", "end_y"] } },
+    { "if": { "properties": { "type": { "const": "shot" } } }, "then": { "required": ["player", "shot", "outcome"] } },
+    { "if": { "required": ["climax"], "properties": { "climax": { "const": true } } }, "then": { "required": ["moment_id"] } }
+  ]
+}

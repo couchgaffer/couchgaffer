@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "ws-message.schema.json",
+  "title": "WsMessage",
+  "description": "Envelope for every message from the app server to a screen over the WebSocket. One socket per screen; the server sends only cues for that screen, plus meta (a single match) or gameweek (#94), league, frames, events and decisions.",
+  "type": "object",
+  "required": ["v", "type", "data"],
+  "additionalProperties": false,
+  "properties": {
+    "v": { "const": 1 },
+    "type": { "enum": ["meta", "gameweek", "league", "frame", "event", "decision", "cue"] },
+    "data": { "type": "object" }
+  },
+  "allOf": [
+    { "if": { "properties": { "type": { "const": "meta" } } }, "then": { "properties": { "data": { "$ref": "match-meta.schema.json" } } } },
+    { "if": { "properties": { "type": { "const": "gameweek" } } }, "then": { "properties": { "data": { "$ref": "gameweek.schema.json" } } } },
+    { "if": { "properties": { "type": { "const": "league" } } }, "then": { "properties": { "data": { "$ref": "league.schema.json" } } } },
+    { "if": { "properties": { "type": { "const": "frame" } } }, "then": { "properties": { "data": { "$ref": "match-frame.schema.json" } } } },
+    { "if": { "properties": { "type": { "const": "event" } } }, "then": { "properties": { "data": { "$ref": "match-event.schema.json" } } } },
+    { "if": { "properties": { "type": { "const": "decision" } } }, "then": { "properties": { "data": { "$ref": "host-decision.schema.json" } } } },
+    { "if": { "properties": { "type": { "const": "cue" } } }, "then": { "properties": { "data": { "$ref": "cue.schema.json" } } } }
+  ]
+}

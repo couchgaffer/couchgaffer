@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- Couch Gaffer: a ball over a lower third's gold tab, on floodlit navy (#184) -->
+  <rect width="32" height="32" rx="5" fill="#0c1626"/>
+  <circle cx="16" cy="12.5" r="6.5" fill="#f4f2ec"/>
+  <path d="M16 8.9 l3.4 2.5 -1.3 4 h-4.2 l-1.3 -4 z" fill="#0c1626"/>
+  <path d="M4 22 H28 L25.5 27.5 H4 Z" fill="#f4b73f"/>
+</svg>

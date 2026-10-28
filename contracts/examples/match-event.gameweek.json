@@ -1,0 +1,20 @@
+{
+  "seq": 1235,
+  "t": 2534000,
+  "type": "shot",
+  "team": "home",
+  "x": 0.88,
+  "y": 0.41,
+  "outcome": "goal",
+  "shot": {
+    "xg": 0.31,
+    "speed_km_h": 90,
+    "body_part": "right_foot"
+  },
+  "opponent": "p_rav_1",
+  "player": "p_kes_9",
+  "moment_id": "m_09",
+  "scenario": "counterattack",
+  "climax": true,
+  "fixture_id": "fx_2"
+}

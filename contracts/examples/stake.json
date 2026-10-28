@@ -1,0 +1,81 @@
+{
+  "moment_id": "m_07",
+  "manager": "mgr_2",
+  "t": 2534000,
+  "delta_points": 8,
+  "total_points": 226,
+  "rank_before": 2,
+  "rank_after": 1,
+  "players": [
+    "p_away_1"
+  ],
+  "reason_code": "save_tier_reached",
+  "milestone": {
+    "name": "save_tier",
+    "progress": 3,
+    "target": 5
+  },
+  "above_threshold": true,
+  "evidence": [
+    {
+      "id": "ev_412_xg",
+      "label": "xG of the saved shot",
+      "value": 0.31,
+      "unit": "xg",
+      "source": {
+        "kind": "event",
+        "event_seq": [
+          412
+        ]
+      }
+    },
+    {
+      "id": "ev_p_away_1_saves",
+      "label": "Saves by Rhys Mallory so far",
+      "value": 3,
+      "unit": "count",
+      "source": {
+        "kind": "computed",
+        "event_seq": [
+          233,
+          351,
+          412
+        ],
+        "formula": "save_count@v1"
+      }
+    },
+    {
+      "id": "ev_m_07_mgr_2_delta",
+      "label": "Impact points for Priya from this moment",
+      "value": 8,
+      "unit": "ip",
+      "source": {
+        "kind": "computed",
+        "event_seq": [
+          412
+        ],
+        "formula": "save_points@v1+save_tier@v1+captain_x2@v1"
+      }
+    }
+  ],
+  "facts": [
+    {
+      "id": "f_m_07_mgr_2_differential",
+      "kind": "differential",
+      "player": "p_away_1",
+      "owners": 1,
+      "evidence_ids": [
+        "ev_p_away_1_saves"
+      ]
+    },
+    {
+      "id": "f_m_07_mgr_2_rank",
+      "kind": "rank_change",
+      "rank_before": 2,
+      "rank_after": 1,
+      "evidence_ids": [
+        "ev_m_07_mgr_2_delta"
+      ]
+    }
+  ]
+}

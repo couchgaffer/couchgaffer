@@ -1,0 +1,160 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "common.schema.json",
+  "title": "Shared definitions",
+  "$defs": {
+    "matchTimeMs": {
+      "description": "Match time in milliseconds from kick-off. 90 minutes is 5400000; stoppage time runs past it.",
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 7200000
+    },
+    "unit": {
+      "description": "Pitch coordinate, normalised. x runs from the home goal line (0) to the away goal line (1); y runs from the left touchline (0) to the right (1), seen from the home end. The pitch is 105 m by 68 m.",
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "side": { "enum": ["home", "away"]},
+    "teamId": { "type": "string", "pattern": "^t_[a-z0-9]+$" },
+    "playerId": { "type": "string", "pattern": "^p_(home|away|[a-z]{3})_[0-9]{1,2}$" },
+    "fixtureId": { "type": "string", "pattern": "^fx_[1-9]$" },
+    "managerId": { "type": "string", "pattern": "^mgr_[1-5]$" },
+    "momentId": { "type": "string", "pattern": "^m_[0-9]{2,3}$" },
+    "evidenceId": { "type": "string", "pattern": "^ev_[a-z0-9_]+$" },
+    "lang": { "description": "BCP 47 language tag: en or es (#16).", "type": "string", "pattern": "^[a-z]{2}(-[A-Z]{2})?$" },
+    "style": {
+      "description": "Rule 4.1(e): analyst gets the numbers and the evidence; casual gets one plain sentence.",
+      "enum": ["analyst", "casual"]
+    },
+    "evidence": {
+      "description": "One number an agent may use. Every number in any text shown to a viewer must match the value of an evidence item it cites.",
+      "type": "object",
+      "required": ["id", "label", "value", "source"],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "$ref": "#/$defs/evidenceId" },
+        "label": { "type": "string", "maxLength": 80},
+        "value": { "type": "number" },
+        "unit": { "enum": ["ip", "xg", "km_h", "m", "count", "ratio", "minute"]},
+        "source": {
+          "type": "object",
+          "required": ["kind"],
+          "additionalProperties": false,
+          "properties": {
+            "kind": { "enum": ["event", "computed"]},
+            "event_seq": { "type": "array", "items": { "type": "integer", "minimum": 0}},
+            "formula": { "type": "string", "description": "Name and version of the rule or metric, for example save_points@v1." }
+          }
+        }
+      }
+    },
+    "factId": { "type": "string", "pattern": "^f_[a-z0-9_]+$" },
+    "fact": {
+      "description": "A fact about what a moment means for one manager, computed by the points engine (#87). Agents may only cite facts from their own manager's stake.",
+      "oneOf": [
+        {
+          "title": "Fact differential",
+          "description": "Only this manager owns the player involved.",
+          "type": "object",
+          "required": ["id", "kind", "evidence_ids", "player", "owners"],
+          "additionalProperties": false,
+          "properties": {
+            "id": { "$ref": "#/$defs/factId" },
+            "kind": { "const": "differential" },
+            "evidence_ids": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/evidenceId" }},
+            "player": { "$ref": "#/$defs/playerId" },
+            "owners": { "const": 1}
+          }
+        },
+        {
+          "title": "Fact template",
+          "description": "At least three managers own the player involved, so the moment barely moves the table between them.",
+          "type": "object",
+          "required": ["id", "kind", "evidence_ids", "player", "owners"],
+          "additionalProperties": false,
+          "properties": {
+            "id": { "$ref": "#/$defs/factId" },
+            "kind": { "const": "template" },
+            "evidence_ids": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/evidenceId" }},
+            "player": { "$ref": "#/$defs/playerId" },
+            "owners": { "type": "integer", "minimum": 3, "maximum": 5}
+          }
+        },
+        {
+          "title": "Fact captain_swing",
+          "description": "This manager's captain scored double against managers who own but do not captain him.",
+          "type": "object",
+          "required": ["id", "kind", "evidence_ids", "player", "extra_points", "versus"],
+          "additionalProperties": false,
+          "properties": {
+            "id": { "$ref": "#/$defs/factId" },
+            "kind": { "const": "captain_swing" },
+            "evidence_ids": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/evidenceId" }},
+            "player": { "$ref": "#/$defs/playerId" },
+            "extra_points": { "description": "Points the armband added; a captain who lost points is no swing.", "type": "number", "exclusiveMinimum": 0},
+            "versus": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/managerId" }}
+          }
+        },
+        {
+          "title": "Fact rank_change",
+          "description": "The moment moved this manager's league position; emitted only when rank_before differs from rank_after.",
+          "type": "object",
+          "required": ["id", "kind", "evidence_ids", "rank_before", "rank_after"],
+          "additionalProperties": false,
+          "properties": {
+            "id": { "$ref": "#/$defs/factId" },
+            "kind": { "const": "rank_change" },
+            "evidence_ids": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/evidenceId" }},
+            "rank_before": { "type": "integer", "minimum": 1, "maximum": 5},
+            "rank_after": { "type": "integer", "minimum": 1, "maximum": 5}
+          }
+        },
+        {
+          "title": "Fact expected_vs_actual",
+          "description": "Goal points a player has scored so far against the goal points expected from the xG of his chances, both before any captain multiplier; other awards count on neither side.",
+          "type": "object",
+          "required": ["id", "kind", "evidence_ids", "player", "expected_points", "actual_points", "xg"],
+          "additionalProperties": false,
+          "properties": {
+            "id": { "$ref": "#/$defs/factId" },
+            "kind": { "const": "expected_vs_actual" },
+            "evidence_ids": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/evidenceId" }},
+            "player": { "$ref": "#/$defs/playerId" },
+            "expected_points": { "description": "His xG so far times the points for a goal.", "type": "number" },
+            "actual_points": { "description": "His goals so far times the points for a goal.", "type": "number" },
+            "xg": { "type": "number", "minimum": 0}
+          }
+        },
+        {
+          "title": "Fact pass_quality",
+          "description": "The pass that led to the moment.",
+          "type": "object",
+          "required": ["id", "kind", "evidence_ids", "player", "distance_m", "difficulty"],
+          "additionalProperties": false,
+          "properties": {
+            "id": { "$ref": "#/$defs/factId" },
+            "kind": { "const": "pass_quality" },
+            "evidence_ids": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/evidenceId" }},
+            "player": { "$ref": "#/$defs/playerId" },
+            "distance_m": { "type": "number", "minimum": 0},
+            "difficulty": { "type": "number", "minimum": 0, "maximum": 1}
+          }
+        },
+        {
+          "title": "Fact elsewhere",
+          "description": "In a gameweek: this manager's points so far from every fixture but the stake's own, the one number about other fixtures an agent may cite (#94). Emitted only when it is not zero.",
+          "type": "object",
+          "required": ["id", "kind", "evidence_ids", "points"],
+          "additionalProperties": false,
+          "properties": {
+            "id": { "$ref": "#/$defs/factId" },
+            "kind": { "const": "elsewhere" },
+            "evidence_ids": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/evidenceId" }},
+            "points": { "description": "Points from the other fixtures, captain multiplier included.", "type": "number" }
+          }
+        }
+      ]
+    }
+  }
+}

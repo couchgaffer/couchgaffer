@@ -1,0 +1,143 @@
+name: Deploy
+
+# Run by hand from main: build the app and recap images, push them, roll the recap job and the app onto
+# them, wait for the new revision to be ready, and smoke-test the live URL. If anything after the roll fails
+# or the run is cancelled, both go back to the images they ran before, so judges never meet a broken
+# revision.
+# Azure access is GitHub OIDC to a managed identity (infra/main.bicep, id-watchparty-deploy): no secrets.
+# workflow_dispatch only: a deploy restarts the single replica and ends every live match, so a green CI on
+# main must not deploy by itself.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: deploy
+  cancel-in-progress: false
+
+env:
+  REGISTRY: watchpartyd4d84f
+  RESOURCE_GROUP: rg-watchparty
+  APP: ca-watchparty
+  RECAP_JOB: caj-watchparty-recap
+
+jobs:
+  deploy:
+    # Only main deploys. always(): when a run is cancelled, GitHub cancels every job whose condition is false,
+    # and no condition means success(), so the rollback step's cancelled() would never be reached. With
+    # always() the job keeps running, the remaining steps skip, and the rollback runs.
+    if: always() && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04 # pinned, as in CI (#50)
+    timeout-minutes: 40 # the build, the revision wait, then a whole match at 30x and the five recaps (#40)
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      # Only a release deploys (#93): this commit must be main's tip on origin with one vX.Y.Z tag there. The
+      # same check as scripts/deploy.sh. It reads origin with ls-remote, so the token is given to git for this
+      # step only, through the environment, as checkout does; nothing is written to .git/config.
+      - name: Check this is a release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          auth="$(printf 'x-access-token:%s' "$GH_TOKEN" | base64 | tr -d '\n')"
+          echo "::add-mask::$auth"
+          export GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0="http.https://github.com/.extraheader"
+          export GIT_CONFIG_VALUE_0="AUTHORIZATION: basic $auth"
+          version="$(scripts/release_tag.sh)"
+          echo "Deploying $version" >> "$GITHUB_STEP_SUMMARY"
+      - uses: azure/login@a641126d1b8aa4d1fa005f4f92df94a3a4c4c906 # v3.1.0
+        with:
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+      - name: Build and push the images
+        run: |
+          sha="$(git rev-parse HEAD)"
+          app="$REGISTRY.azurecr.io/watchparty:$sha"
+          recap="$REGISTRY.azurecr.io/watchparty-recap:$sha"
+          az acr login --name "$REGISTRY"
+          docker build --tag "$app" .
+          docker build --target recap --tag "$recap" .
+          docker push "$app"
+          docker push "$recap"
+          echo "IMAGE=$app" >> "$GITHUB_ENV"
+          echo "RECAP_IMAGE=$recap" >> "$GITHUB_ENV"
+      - name: Record the images running now, to roll back to
+        run: |
+          az config set extension.use_dynamic_install=yes_without_prompt --only-show-errors
+          image='properties.template.containers[0].image'
+          # Into variables first: inside echo a failed az would be hidden, the roll would go ahead, and the
+          # rollback step, which needs both, would not run.
+          app="$(az containerapp show --name "$APP" --resource-group "$RESOURCE_GROUP" --query "$image" --output tsv)"
+          recap="$(az containerapp job show --name "$RECAP_JOB" --resource-group "$RESOURCE_GROUP" \
+            --query "$image" --output tsv)"
+          if [ -z "$app" ] || [ -z "$recap" ]; then
+            echo "::error::could not read the images running now; nothing rolled"
+            exit 1
+          fi
+          echo "PREVIOUS_IMAGE=$app" >> "$GITHUB_ENV"
+          echo "PREVIOUS_RECAP_IMAGE=$recap" >> "$GITHUB_ENV"
+      - name: Roll the recap job, then the app, onto them
+        run: |
+          az containerapp job update --name "$RECAP_JOB" --resource-group "$RESOURCE_GROUP" --image "$RECAP_IMAGE" \
+            --only-show-errors --output none
+          revision="$(az containerapp update --name "$APP" --resource-group "$RESOURCE_GROUP" --image "$IMAGE" \
+            --only-show-errors --query properties.latestRevisionName --output tsv)"
+          [ -n "$revision" ] || { echo "::error::az containerapp update did not name the new revision"; exit 1; }
+          echo "NEW_REVISION=$revision" >> "$GITHUB_ENV"
+      # In single revision mode Azure keeps traffic on the old revision until the new one is ready, and /health
+      # is the same on both: without this wait a broken image passes the smoke against the old revision (#68).
+      - name: Wait for the new revision to be healthy and ready
+        run: |
+          for _ in $(seq 1 30); do  # 5 minutes
+            running="$(az containerapp revision show --name "$APP" --resource-group "$RESOURCE_GROUP" \
+              --revision "$NEW_REVISION" --query properties.runningState --output tsv)"
+            if [ "$running" = Failed ]; then echo "::error::revision $NEW_REVISION failed to start"; exit 1; fi
+            health="$(az containerapp revision show --name "$APP" --resource-group "$RESOURCE_GROUP" \
+              --revision "$NEW_REVISION" --query properties.healthState --output tsv)"
+            ready="$(az containerapp show --name "$APP" --resource-group "$RESOURCE_GROUP" \
+              --query properties.latestReadyRevisionName --output tsv)"
+            if [ "$health" = Healthy ] && [ "$ready" = "$NEW_REVISION" ]; then exit 0; fi
+            echo "$NEW_REVISION: $running, $health; latest ready $ready"
+            sleep 10
+          done
+          echo "::error::revision $NEW_REVISION was not healthy and ready within 5 minutes"
+          exit 1
+      - name: Check the new revision runs the image just pushed
+        run: |
+          image="$(az containerapp revision show --name "$APP" --resource-group "$RESOURCE_GROUP" \
+            --revision "$NEW_REVISION" --query 'properties.template.containers[0].image' --output tsv)"
+          if [ "$image" != "$IMAGE" ]; then echo "::error::revision $NEW_REVISION runs $image, not $IMAGE"; exit 1; fi
+      - uses: astral-sh/setup-uv@07a047e608db84b3d8c06cd9a7c7dcc9c355c18e # v10.3.2
+        with:
+          version: "0.10.6" # as in CI and the Dockerfile (#50)
+      - name: Smoke test the live app
+        timeout-minutes: 25 # a hung smoke fails here, with time left in the job for the rollback
+        working-directory: backend
+        env:
+          APP_URL: ${{ vars.APP_URL }}
+        run: |
+          for _ in $(seq 1 12); do  # the new revision may still be starting
+            curl --fail --silent --max-time 10 "$APP_URL/health" > /dev/null && break
+            sleep 10
+          done
+          uv run --locked python -m tools.smoke "$APP_URL" --full  # agents, summaries, Foundry IQ, Spanish, recaps
+      - name: Roll back to the images that ran before
+        if: (failure() || cancelled()) && env.PREVIOUS_IMAGE != '' && env.PREVIOUS_RECAP_IMAGE != ''
+        run: |
+          set +e  # try both, whatever the first does
+          az containerapp job update --name "$RECAP_JOB" --resource-group "$RESOURCE_GROUP" \
+            --image "$PREVIOUS_RECAP_IMAGE" --only-show-errors --output none
+          recap_status=$?
+          az containerapp update --name "$APP" --resource-group "$RESOURCE_GROUP" --image "$PREVIOUS_IMAGE" \
+            --only-show-errors --query properties.latestRevisionName --output tsv
+          app_status=$?
+          [ "$recap_status" -eq 0 ] || echo "::error::The recap job did NOT roll back; set it to $PREVIOUS_RECAP_IMAGE by hand."
+          [ "$app_status" -eq 0 ] || echo "::error::The app did NOT roll back; set it to $PREVIOUS_IMAGE by hand."
+          [ "$recap_status" -eq 0 ] && [ "$app_status" -eq 0 ] || exit 1
+          echo "::error::Rolled back to $PREVIOUS_IMAGE and $PREVIOUS_RECAP_IMAGE; this run stays red."

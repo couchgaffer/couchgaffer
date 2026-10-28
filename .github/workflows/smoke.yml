@@ -1,0 +1,29 @@
+name: Smoke test
+
+# Daily: the live URL plays a whole demo match like a judge would, and fails without the agents'
+# explanations and summaries, a rulebook citation, Spanish text with its English copy, and all five recap
+# videos. No Azure access needed.
+on:
+  schedule:
+    - cron: "17 6 * * *" # 06:17 UTC daily
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-24.04 # pinned, as in CI (#50)
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@07a047e608db84b3d8c06cd9a7c7dcc9c355c18e # v10.3.2
+        with:
+          version: "0.10.6" # as in CI and the Dockerfile (#50)
+      - name: Smoke test the live app
+        working-directory: backend
+        env:
+          APP_URL: ${{ vars.APP_URL }}
+        run: uv run --locked python -m tools.smoke "$APP_URL" --full

@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+# Gitflow guard (#93). Install once per clone with `make hooks` (git config core.hooksPath .githooks).
+#
+# - A push to main or develop, and a push or delete of a v* tag, is refused unless ALLOW_PROTECTED_PUSH=1 is
+#   set. The integrator merges locally and pushes (docs/releasing.md), and those documented
+#   steps set it; an accidental push does not.
+# - A tag that already exists on the remote is never moved in one push, with or without the variable: a
+#   release tag names one commit for good, and scripts/deploy.sh trusts origin's tag. Deleting a tag and
+#   pushing it again, both with the variable set, still moves it; the release steps never do that.
+# - Any other branch must be named <prefix>/<issue>-<slug>, or release/X.Y.Z. The issue number has no
+#   leading zero. Deleting such a branch is not checked.
+#
+# Hooks run only where installed and `git push --no-verify` skips them: this makes mistakes less likely, not
+# impossible. Bash 3.2 compatible (macOS /bin/bash).
+set -uo pipefail
+
+ticket='^(feature|bugfix|hotfix|chore|fix|ci|infra|refactor|docs)/[1-9][0-9]*-[a-z0-9][a-z0-9._-]*$'
+release='^release/(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$'
+
+refused=0
+refuse() { echo "pre-push: $*" >&2; refused=1; }
+allowed() { [[ "${ALLOW_PROTECTED_PUSH:-}" == 1 ]]; }
+zero() { [[ "$1" =~ ^0+$ ]]; }
+
+check_tag() {  # check_tag TAG LOCAL_SHA REMOTE_SHA
+  local tag=$1 local_sha=$2 remote_sha=$3
+  if ! zero "$local_sha" && ! zero "$remote_sha"; then
+    refuse "refusing to move tag $tag, which the remote already has; a release tag is never moved"
+    return
+  fi
+  [[ "$tag" == v* ]] || return 0
+  allowed || refuse "refusing to push tag $tag. Release tags are pushed by the release steps, which set ALLOW_PROTECTED_PUSH=1 (docs/releasing.md)"
+}
+
+check_branch() {  # check_branch BRANCH LOCAL_SHA
+  local branch=$1 local_sha=$2
+  if [[ "$branch" == main || "$branch" == develop ]]; then
+    allowed || refuse "refusing to push to $branch. Open a pull request; the integrator's merge sets ALLOW_PROTECTED_PUSH=1 (docs/releasing.md)"
+    return
+  fi
+  zero "$local_sha" && return 0  # deleting a branch
+  [[ "$branch" =~ $ticket || "$branch" =~ $release ]] ||
+    refuse "branch $branch is not <prefix>/<issue>-<slug> (feature, bugfix, hotfix, chore, fix, ci, infra, refactor, docs) or release/X.Y.Z"
+}
+
+while read -r _ local_sha remote_ref remote_sha; do  # git writes: local ref, local sha, remote ref, remote sha
+  case "$remote_ref" in
+    refs/tags/*) check_tag "${remote_ref#refs/tags/}" "$local_sha" "$remote_sha" ;;
+    refs/heads/*) check_branch "${remote_ref#refs/heads/}" "$local_sha" ;;
+  esac
+done
+
+exit "$refused"

@@ -1,0 +1,22 @@
+{
+  "version": "v1",
+  "name": "Impact points",
+  "unit": "IP",
+  "captain_multiplier": 2,
+  "threshold_points": 2,
+  "rules": {
+    "goal": {"label": "Goal scored", "points": 5},
+    "long_odds_goal": {"label": "Goal from a shot with xG under 0.15", "points": 2, "max_xg": 0.15},
+    "shot_on_target": {"label": "Shot saved or scored", "points": 1},
+    "chance_created": {"label": "Pass that sets up a shot of xG 0.2 or more", "per_xg": 5, "min_xg": 0.2},
+    "progressive_pass": {"label": "Completed progressive pass, at most 3 a half", "points": 0.5, "max_per_half": 3},
+    "ball_win": {"label": "Tackle or interception won", "points": 0.5},
+    "press_win": {"label": "Pressure that wins the ball back within 5 seconds", "points": 1, "window_ms": 5000},
+    "save_points": {"label": "Save, worth more against a better chance", "points": 1, "per_xg": 4},
+    "save_tier": {"label": "Wall tier: 3 saves, then 5 saves", "tiers": [[3, 2], [5, 3]]},
+    "shutout_stretch": {"label": "Keeper or defender: each 30 minutes without conceding", "points": 1, "every_ms": 1800000},
+    "conceded": {"label": "Keeper or defender on the pitch when a goal is conceded", "points": -1},
+    "yellow_card": {"label": "Yellow card", "points": -1},
+    "red_card": {"label": "Red card", "points": -3}
+  }
+}

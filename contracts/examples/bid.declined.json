@@ -1,0 +1,9 @@
+{
+  "moment_id": "m_09",
+  "manager": "mgr_4",
+  "style": "analyst",
+  "lang": "es",
+  "status": "declined",
+  "latency_ms": 840,
+  "model": "gpt-5.4-mini"
+}

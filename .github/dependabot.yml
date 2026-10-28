@@ -1,0 +1,22 @@
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule: { interval: weekly }
+    open-pull-requests-limit: 3
+  - package-ecosystem: uv
+    directory: /backend
+    schedule: { interval: weekly }
+    open-pull-requests-limit: 3
+  - package-ecosystem: npm
+    directory: /frontend
+    schedule: { interval: weekly }
+    open-pull-requests-limit: 3
+  - package-ecosystem: docker
+    directory: /
+    schedule: { interval: weekly }
+    open-pull-requests-limit: 3
+    # Base images are pinned on purpose: Node 24 (LTS) and Python 3.12 (requires-python). Patch and minor only.
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]

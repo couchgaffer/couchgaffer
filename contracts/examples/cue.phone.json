@@ -1,0 +1,13 @@
+{
+  "cue_id": "c_32", "seq": 32, "screen": "phone:mgr_2", "moment_id": "m_07",
+  "show_at": 2534000, "min_dwell_ms": 4000, "expires_at": 2720000, "replaces": "c_30",
+  "kind": "explanation", "source": "manager",
+  "payload": {
+    "headline": "Wall tier: +8 IP",
+    "body": "Rhys Mallory's third save tonight, against a 0.31 xG shot, unlocks the Wall tier. With the captain double that is 8 IP.",
+    "lang": "en", "style": "analyst", "manager": "mgr_2", "player": "p_away_1",
+    "evidence": [
+      { "id": "ev_412_xg", "label": "xG of the saved shot", "value": 0.31, "unit": "xg", "source": { "kind": "event", "event_seq": [412] } }
+    ]
+  }
+}

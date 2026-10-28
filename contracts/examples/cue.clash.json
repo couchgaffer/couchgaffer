@@ -1,0 +1,26 @@
+{
+  "cue_id": "c_30",
+  "seq": 30,
+  "screen": "group",
+  "moment_id": "m_07",
+  "show_at": 2534000,
+  "min_dwell_ms": 1000,
+  "expires_at": 2720000,
+  "kind": "clash",
+  "source": "host",
+  "payload": {
+    "headline": "Close call",
+    "verdict_at": 2564000,
+    "contenders": [
+      {
+        "manager": "mgr_2",
+        "pitch": "Priya's keeper reaches the Wall tier."
+      },
+      {
+        "manager": "mgr_1",
+        "pitch": "Jo's captain saved, one off the bonus."
+      }
+    ],
+    "winner": "mgr_1"
+  }
+}

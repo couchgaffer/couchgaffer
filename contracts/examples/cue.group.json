@@ -1,0 +1,10 @@
+{
+  "cue_id": "c_31", "seq": 31, "screen": "group", "moment_id": "m_07",
+  "show_at": 2534000, "min_dwell_ms": 6000, "expires_at": 2720000,
+  "kind": "host_reason", "source": "host",
+  "payload": {
+    "headline": "Big save on your captain",
+    "body": "Close call. Priya has had the screen most tonight; You have been overruled twice.",
+    "manager": "mgr_1", "player": "p_home_9"
+  }
+}

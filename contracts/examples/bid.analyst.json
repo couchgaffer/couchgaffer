@@ -1,0 +1,7 @@
+{
+  "moment_id": "m_07", "manager": "mgr_2", "style": "analyst", "lang": "en", "urgency": 0.8,
+  "explanation": "Rhys Mallory's third save tonight, against a 0.31 xG shot, unlocks the Wall tier. With the captain double that is 8 IP.",
+  "pitch_to_host": "Priya's captain keeper just reached the Wall tier: the biggest swing of the night.",
+  "evidence_ids": ["ev_412_xg", "ev_p_away_1_saves", "ev_m_07_mgr_2_delta"],
+  "status": "ok", "latency_ms": 2140, "model": "manager-fast"
+}
