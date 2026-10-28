@@ -40,7 +40,7 @@ dev = [
 ]
 # Only the recap job's image needs these (#15); the app image stays without them.
 recap = [
-    "pillow==12.3.0",
+    "pillow==13.0.0",
 ]
 
 [tool.uv]
