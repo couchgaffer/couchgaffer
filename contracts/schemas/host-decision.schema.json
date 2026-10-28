@@ -1,0 +1,100 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "host-decision.schema.json",
+  "title": "HostDecision",
+  "description": "Which manager's moment the group screen shows, and who decided. Also the trace for the video and the input to the recap.",
+  "type": "object",
+  "required": ["moment_id", "t", "chosen_manager", "source", "close_call", "scores"],
+  "additionalProperties": false,
+  "properties": {
+    "moment_id": { "$ref": "common.schema.json#/$defs/momentId" },
+    "fixture_id": { "$ref": "common.schema.json#/$defs/fixtureId" },
+    "t": { "$ref": "common.schema.json#/$defs/matchTimeMs" },
+    "chosen_manager": { "$ref": "common.schema.json#/$defs/managerId" },
+    "source": {
+      "description": "scorer: clear winner, no model call. host: close call settled by the host agent. fallback: host timed out, scorer's pick used.",
+      "enum": ["scorer", "host", "fallback"]
+    },
+    "close_call": {
+      "description": "Whether the scorer had no clear winner. Only a close call's losers count as overruled.",
+      "type": "boolean"
+    },
+    "reason": { "description": "Shown on the group screen when source is host.", "type": "string", "maxLength": 140},
+    "scores": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 5,
+      "items": {
+        "type": "object",
+        "required": ["manager", "score", "airtime_share", "overruled_count"],
+        "additionalProperties": false,
+        "properties": {
+          "manager": { "$ref": "common.schema.json#/$defs/managerId" },
+          "score": { "type": "number", "minimum": 0},
+          "airtime_share": { "type": "number", "minimum": 0, "maximum": 1},
+          "overruled_count": { "type": "integer", "minimum": 0},
+          "pitch": {
+            "description": "The manager agent's one-line bid for the group screen.",
+            "type": "string",
+            "maxLength": 140
+          },
+          "status": {
+            "description": "How the bid was made: ok, retried after a failed check, or a plain-stat fallback.",
+            "enum": ["ok", "retried", "fallback"]
+          },
+          "latency_ms": { "description": "How long the bid took.", "type": "integer", "minimum": 0},
+          "pitch_source": { "description": "Who wrote the pitch: manager (the agent) or code (#138).", "enum": ["manager", "code"]},
+          "angle": { "$ref": "common.schema.json#/$defs/factId" }
+        }
+      },
+      "description": "One row per bid that was scored. Declined bids are not scored and do not appear."
+    },
+    "latency_ms": { "type": "integer", "minimum": 0},
+    "knocked_out": {
+      "description": "Set on the decision of the moment that spent a \"simulate failure\" press (#90): the arm id the chaos endpoint returned, and the one manager whose agent was skipped (absent: every agent).",
+      "type": "object",
+      "required": ["arm"],
+      "additionalProperties": false,
+      "properties": {
+        "arm": { "type": "integer", "minimum": 1},
+        "manager": { "$ref": "common.schema.json#/$defs/managerId" }
+      }
+    },
+    "because": {
+      "description": "Why the host chose. rank_change, differential and captain_swing name a fact kind: the chosen contender's angle must be a fact of that kind, checked by code. bigger_swing, least_airtime, most_close_calls_lost, dead_heat and scorer_pick are scorer reasons from the points and the ledger (#88).",
+      "enum": [
+        "bigger_swing",
+        "least_airtime",
+        "most_close_calls_lost",
+        "dead_heat",
+        "scorer_pick",
+        "rank_change",
+        "differential",
+        "captain_swing"
+      ]
+    },
+    "contenders": {
+      "description": "The two pitches the group screen shows on a close call before the verdict (#89). Two different managers; set on every close call settled by the host.",
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": {
+        "type": "object",
+        "required": ["manager", "pitch"],
+        "additionalProperties": false,
+        "properties": {
+          "manager": { "$ref": "common.schema.json#/$defs/managerId" },
+          "pitch": { "type": "string", "maxLength": 140, "minLength": 1},
+          "angle": { "$ref": "common.schema.json#/$defs/factId" }
+        }
+      }
+    }
+  },
+  "allOf": [
+    {"if": {"properties": {"source": {"const": "host"}}}, "then": {"required": ["reason"]}},
+    {
+      "if": {"properties": {"source": {"const": "host"}, "close_call": {"const": true}}},
+      "then": {"required": ["because", "contenders"]}
+    }
+  ]
+}

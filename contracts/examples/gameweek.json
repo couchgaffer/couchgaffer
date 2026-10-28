@@ -1,0 +1,479 @@
+{
+  "gameweek_id": "gw_demo_01",
+  "seed": 7,
+  "speed": 30,
+  "playback_delay_ms": 5000,
+  "fixtures": [
+    {
+      "fixture_id": "fx_1",
+      "match_id": "match_gw_demo_01_1",
+      "seed": 101,
+      "speed": 30,
+      "playback_delay_ms": 5000,
+      "home": {
+        "id": "t_hollinsford",
+        "name": "Hollinsford United",
+        "short_name": "HOL",
+        "colour": "#1f5fbf",
+        "formation": "4-3-3",
+        "players": [
+          {
+            "id": "p_hol_1",
+            "name": "Tom Ashcombe",
+            "shirt": 1,
+            "position": "GK"
+          },
+          {
+            "id": "p_hol_2",
+            "name": "Reece Holloway",
+            "shirt": 2,
+            "position": "DEF"
+          },
+          {
+            "id": "p_hol_3",
+            "name": "Joel Okonta",
+            "shirt": 4,
+            "position": "DEF"
+          },
+          {
+            "id": "p_hol_4",
+            "name": "Mateus Varela",
+            "shirt": 5,
+            "position": "DEF"
+          },
+          {
+            "id": "p_hol_5",
+            "name": "Callum Bryer",
+            "shirt": 3,
+            "position": "DEF"
+          },
+          {
+            "id": "p_hol_6",
+            "name": "Kwame Adomako",
+            "shirt": 6,
+            "position": "MID"
+          },
+          {
+            "id": "p_hol_7",
+            "name": "Ollie Fenwick",
+            "shirt": 8,
+            "position": "MID"
+          },
+          {
+            "id": "p_hol_8",
+            "name": "Rafael Dunmore",
+            "shirt": 10,
+            "position": "MID"
+          },
+          {
+            "id": "p_hol_9",
+            "name": "Jonah Pryce",
+            "shirt": 9,
+            "position": "FWD"
+          },
+          {
+            "id": "p_hol_10",
+            "name": "Tayo Brennan",
+            "shirt": 7,
+            "position": "FWD"
+          },
+          {
+            "id": "p_hol_11",
+            "name": "Luca Ferrante",
+            "shirt": 11,
+            "position": "FWD"
+          }
+        ]
+      },
+      "away": {
+        "id": "t_saltmere",
+        "name": "Saltmere Rovers",
+        "short_name": "SAL",
+        "colour": "#b8322a",
+        "formation": "4-2-3-1",
+        "players": [
+          {
+            "id": "p_sal_1",
+            "name": "Rhys Mallory",
+            "shirt": 1,
+            "position": "GK"
+          },
+          {
+            "id": "p_sal_2",
+            "name": "Danny Oduya",
+            "shirt": 2,
+            "position": "DEF"
+          },
+          {
+            "id": "p_sal_3",
+            "name": "Lasse Vikholm",
+            "shirt": 5,
+            "position": "DEF"
+          },
+          {
+            "id": "p_sal_4",
+            "name": "Marcus Eyre",
+            "shirt": 6,
+            "position": "DEF"
+          },
+          {
+            "id": "p_sal_5",
+            "name": "Theo Langford",
+            "shirt": 3,
+            "position": "DEF"
+          },
+          {
+            "id": "p_sal_6",
+            "name": "Ade Fashola",
+            "shirt": 4,
+            "position": "MID"
+          },
+          {
+            "id": "p_sal_7",
+            "name": "Conor Blythe",
+            "shirt": 8,
+            "position": "MID"
+          },
+          {
+            "id": "p_sal_8",
+            "name": "Elliot Marsden",
+            "shirt": 10,
+            "position": "MID"
+          },
+          {
+            "id": "p_sal_9",
+            "name": "Dylan Crossfield",
+            "shirt": 9,
+            "position": "FWD"
+          },
+          {
+            "id": "p_sal_10",
+            "name": "Malik Tennant",
+            "shirt": 7,
+            "position": "MID"
+          },
+          {
+            "id": "p_sal_11",
+            "name": "Jules Ravier",
+            "shirt": 11,
+            "position": "FWD"
+          }
+        ]
+      }
+    },
+    {
+      "fixture_id": "fx_2",
+      "match_id": "match_gw_demo_01_2",
+      "seed": 102,
+      "speed": 30,
+      "playback_delay_ms": 5000,
+      "home": {
+        "id": "t_kestlebury",
+        "name": "Kestlebury Athletic",
+        "short_name": "KES",
+        "colour": "#e0559c",
+        "formation": "4-4-2",
+        "players": [
+          {
+            "id": "p_kes_1",
+            "name": "Nathan Coldridge",
+            "shirt": 1,
+            "position": "GK"
+          },
+          {
+            "id": "p_kes_2",
+            "name": "Harvey Quennell",
+            "shirt": 2,
+            "position": "DEF"
+          },
+          {
+            "id": "p_kes_3",
+            "name": "Tobi Adekanmi",
+            "shirt": 5,
+            "position": "DEF"
+          },
+          {
+            "id": "p_kes_4",
+            "name": "Anders Kjellvang",
+            "shirt": 6,
+            "position": "DEF"
+          },
+          {
+            "id": "p_kes_5",
+            "name": "Ewan Thursby",
+            "shirt": 3,
+            "position": "DEF"
+          },
+          {
+            "id": "p_kes_6",
+            "name": "Arlo Pennick",
+            "shirt": 7,
+            "position": "MID"
+          },
+          {
+            "id": "p_kes_7",
+            "name": "Declan Marrowby",
+            "shirt": 4,
+            "position": "MID"
+          },
+          {
+            "id": "p_kes_8",
+            "name": "Idris Bensaoud",
+            "shirt": 8,
+            "position": "MID"
+          },
+          {
+            "id": "p_kes_9",
+            "name": "Benji Cortland",
+            "shirt": 9,
+            "position": "FWD"
+          },
+          {
+            "id": "p_kes_10",
+            "name": "Kit Hallowell",
+            "shirt": 11,
+            "position": "MID"
+          },
+          {
+            "id": "p_kes_11",
+            "name": "Ruben Ostrander",
+            "shirt": 10,
+            "position": "FWD"
+          }
+        ]
+      },
+      "away": {
+        "id": "t_ravensholme",
+        "name": "Ravensholme Town",
+        "short_name": "RAV",
+        "colour": "#6b2fa3",
+        "formation": "3-5-2",
+        "players": [
+          {
+            "id": "p_rav_1",
+            "name": "Gareth Pilling",
+            "shirt": 1,
+            "position": "GK"
+          },
+          {
+            "id": "p_rav_2",
+            "name": "Femi Oyelaran",
+            "shirt": 4,
+            "position": "DEF"
+          },
+          {
+            "id": "p_rav_3",
+            "name": "Cian Dorrity",
+            "shirt": 5,
+            "position": "DEF"
+          },
+          {
+            "id": "p_rav_4",
+            "name": "Aaron Weatherill",
+            "shirt": 6,
+            "position": "DEF"
+          },
+          {
+            "id": "p_rav_5",
+            "name": "Louis Treharne",
+            "shirt": 2,
+            "position": "MID"
+          },
+          {
+            "id": "p_rav_6",
+            "name": "Niko Halvard",
+            "shirt": 8,
+            "position": "MID"
+          },
+          {
+            "id": "p_rav_7",
+            "name": "Sami Elkarim",
+            "shirt": 14,
+            "position": "MID"
+          },
+          {
+            "id": "p_rav_8",
+            "name": "Will Ashenden",
+            "shirt": 3,
+            "position": "MID"
+          },
+          {
+            "id": "p_rav_9",
+            "name": "Kwesi Mardle",
+            "shirt": 9,
+            "position": "FWD"
+          },
+          {
+            "id": "p_rav_10",
+            "name": "Josh Brightmore",
+            "shirt": 10,
+            "position": "MID"
+          },
+          {
+            "id": "p_rav_11",
+            "name": "Harry Ferrabee",
+            "shirt": 11,
+            "position": "FWD"
+          }
+        ]
+      }
+    },
+    {
+      "fixture_id": "fx_3",
+      "match_id": "match_gw_demo_01_3",
+      "seed": 103,
+      "speed": 30,
+      "playback_delay_ms": 5000,
+      "home": {
+        "id": "t_pellbrook",
+        "name": "Pellbrook City",
+        "short_name": "PEL",
+        "colour": "#d98a1c",
+        "formation": "4-1-4-1",
+        "players": [
+          {
+            "id": "p_pel_1",
+            "name": "Lewis Farrimond",
+            "shirt": 1,
+            "position": "GK"
+          },
+          {
+            "id": "p_pel_2",
+            "name": "Jamal Peverell",
+            "shirt": 2,
+            "position": "DEF"
+          },
+          {
+            "id": "p_pel_3",
+            "name": "Oskar Brandvik",
+            "shirt": 5,
+            "position": "DEF"
+          },
+          {
+            "id": "p_pel_4",
+            "name": "Ryan Tolhurst",
+            "shirt": 6,
+            "position": "DEF"
+          },
+          {
+            "id": "p_pel_5",
+            "name": "Finn Gatcombe",
+            "shirt": 3,
+            "position": "DEF"
+          },
+          {
+            "id": "p_pel_6",
+            "name": "Moses Adebanjo",
+            "shirt": 4,
+            "position": "MID"
+          },
+          {
+            "id": "p_pel_7",
+            "name": "Charlie Wrenfield",
+            "shirt": 7,
+            "position": "MID"
+          },
+          {
+            "id": "p_pel_8",
+            "name": "Hugo Castellane",
+            "shirt": 8,
+            "position": "MID"
+          },
+          {
+            "id": "p_pel_9",
+            "name": "Archie Bellweather",
+            "shirt": 9,
+            "position": "FWD"
+          },
+          {
+            "id": "p_pel_10",
+            "name": "Ellis Morcombe",
+            "shirt": 10,
+            "position": "MID"
+          },
+          {
+            "id": "p_pel_11",
+            "name": "Tyrese Halden",
+            "shirt": 11,
+            "position": "MID"
+          }
+        ]
+      },
+      "away": {
+        "id": "t_grindlestone",
+        "name": "Grindlestone Wanderers",
+        "short_name": "GRI",
+        "colour": "#1b8a8f",
+        "formation": "5-3-2",
+        "players": [
+          {
+            "id": "p_gri_1",
+            "name": "Joe Ashbrigg",
+            "shirt": 1,
+            "position": "GK"
+          },
+          {
+            "id": "p_gri_2",
+            "name": "Jordan Haltby",
+            "shirt": 2,
+            "position": "DEF"
+          },
+          {
+            "id": "p_gri_3",
+            "name": "Kieran Stopford",
+            "shirt": 4,
+            "position": "DEF"
+          },
+          {
+            "id": "p_gri_4",
+            "name": "Emeka Nwosah",
+            "shirt": 5,
+            "position": "DEF"
+          },
+          {
+            "id": "p_gri_5",
+            "name": "Ben Lowther-Croft",
+            "shirt": 6,
+            "position": "DEF"
+          },
+          {
+            "id": "p_gri_6",
+            "name": "Ross Ellingham",
+            "shirt": 3,
+            "position": "DEF"
+          },
+          {
+            "id": "p_gri_7",
+            "name": "Tariq Holcombe",
+            "shirt": 8,
+            "position": "MID"
+          },
+          {
+            "id": "p_gri_8",
+            "name": "Matty Brockhurst",
+            "shirt": 7,
+            "position": "MID"
+          },
+          {
+            "id": "p_gri_9",
+            "name": "Leon Marchbank",
+            "shirt": 9,
+            "position": "FWD"
+          },
+          {
+            "id": "p_gri_10",
+            "name": "Yannick Dufresne",
+            "shirt": 10,
+            "position": "MID"
+          },
+          {
+            "id": "p_gri_11",
+            "name": "Alfie Rookwood",
+            "shirt": 11,
+            "position": "FWD"
+          }
+        ]
+      }
+    }
+  ]
+}

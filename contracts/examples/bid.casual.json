@@ -1,0 +1,7 @@
+{
+  "moment_id": "m_07", "manager": "mgr_1", "style": "casual", "lang": "en", "urgency": 0.6,
+  "explanation": "Your captain Jonah Pryce forced a big save. 2 points for the effort, but Priya's keeper won this one.",
+  "pitch_to_host": "Their captain nearly scored, and they have been overruled twice tonight.",
+  "evidence_ids": ["ev_m_07_mgr_1_delta"],
+  "status": "retried", "latency_ms": 3380, "model": "manager-fast"
+}

@@ -1,0 +1,10 @@
+{
+  "cue_id": "c_58", "seq": 58, "screen": "group", "moment_id": "m_09", "fixture_id": "fx_2",
+  "show_at": 2534000, "min_dwell_ms": 6000, "expires_at": 2720000,
+  "kind": "explanation", "source": "scorer",
+  "payload": {
+    "headline": "KES 1-0 RAV: goal for Priya",
+    "body": "Priya's captain just scored and took her top of the table.",
+    "body_source": "manager", "manager": "mgr_2", "player": "p_kes_9"
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "bid.schema.json",
+  "title": "Bid",
+  "description": "A manager agent's output for one moment, after the number checker. The explanation goes to that manager's phone; the bid goes to the scorer. The conditional rules here are enforced by the JSON Schema; the generated pydantic and TypeScript types do not enforce them.",
+  "type": "object",
+  "required": ["moment_id", "manager", "style", "lang", "status"],
+  "additionalProperties": false,
+  "properties": {
+    "moment_id": { "$ref": "common.schema.json#/$defs/momentId" },
+    "fixture_id": { "$ref": "common.schema.json#/$defs/fixtureId" },
+    "manager": { "$ref": "common.schema.json#/$defs/managerId" },
+    "style": { "$ref": "common.schema.json#/$defs/style" },
+    "lang": { "$ref": "common.schema.json#/$defs/lang" },
+    "urgency": {
+      "description": "The agent's own claim, 0 to 1. The scorer weighs it; it does not decide.",
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "explanation": { "description": "Shown on the manager's phone.", "type": "string", "minLength": 1, "maxLength": 280},
+    "explanation_en": {
+      "description": "English version when lang is not en, for judges and logs (rule 4.9).",
+      "type": "string",
+      "maxLength": 280
+    },
+    "pitch_to_host": {
+      "description": "One line arguing for the group screen, and the line the group screen shows if this bid wins: English, about the manager in the third person (#138).",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 140
+    },
+    "evidence_ids": { "type": "array", "minItems": 1, "items": { "$ref": "common.schema.json#/$defs/evidenceId" }},
+    "status": {
+      "description": "ok: checked and passed. retried: passed on the one retry. fallback: replaced by the plain stat after a failed check or a timeout. declined: the agent passed on a moment that does not change its manager's points; no phone message, no bid for the screen. Declined bids are not scored: they never appear in a host decision's scores and never reach the group screen.",
+      "enum": ["ok", "retried", "fallback", "declined"]
+    },
+    "latency_ms": { "type": "integer", "minimum": 0},
+    "model": { "description": "Foundry deployment name that produced it.", "type": "string" },
+    "pitch_source": {
+      "description": "Who wrote pitch_to_host: manager (the agent) or code. code on a plain-stat fallback, and when only the pitch failed its checks twice and code's line replaced it, keeping the agent's explanation (#138). Absent means manager unless status is fallback.",
+      "enum": ["manager", "code"]
+    },
+    "angle": {
+      "description": "The fact from this manager's stake the agent chose to argue with (#88). Checked against the stake in the workflow, not here.",
+      "$ref": "common.schema.json#/$defs/factId"
+    }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "status": { "const": "declined" }}},
+      "then": {
+        "not": {
+          "anyOf": [
+            { "required": ["explanation"]},
+            { "required": ["pitch_to_host"]},
+            { "required": ["evidence_ids"]},
+            { "required": ["angle"]},
+            { "required": ["urgency"]},
+            { "required": ["explanation_en"]}
+          ]
+        }
+      },
+      "else": { "required": ["urgency", "explanation", "pitch_to_host", "evidence_ids"]}
+    }
+  ]
+}

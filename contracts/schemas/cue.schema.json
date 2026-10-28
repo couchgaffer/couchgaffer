@@ -1,0 +1,120 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "cue.schema.json",
+  "title": "Cue",
+  "description": "A timed, machine-readable overlay instruction (rule 4.1 stage d). Screens show it at show_at in match time, keep it at least min_dwell_ms, and drop it at expires_at. The cue log is also the edit list for the recap videos.",
+  "type": "object",
+  "required": ["cue_id", "seq", "screen", "show_at", "min_dwell_ms", "expires_at", "kind", "source", "payload"],
+  "additionalProperties": false,
+  "properties": {
+    "cue_id": { "type": "string", "pattern": "^c_[0-9]+$" },
+    "seq": { "description": "Strictly increasing per session, across all screens.", "type": "integer", "minimum": 0},
+    "screen": { "type": "string", "pattern": "^(group|phone:mgr_[1-5])$" },
+    "moment_id": { "$ref": "common.schema.json#/$defs/momentId" },
+    "fixture_id": { "$ref": "common.schema.json#/$defs/fixtureId" },
+    "show_at": { "$ref": "common.schema.json#/$defs/matchTimeMs" },
+    "min_dwell_ms": { "description": "Real milliseconds. The plan uses 6000 on the group screen.", "type": "integer", "minimum": 0},
+    "expires_at": { "$ref": "common.schema.json#/$defs/matchTimeMs" },
+    "replaces": {
+      "description": "cue_id this one replaces, for a plain stat upgraded to an explanation.",
+      "type": "string",
+      "pattern": "^c_[0-9]+$"
+    },
+    "kind": {
+      "description": "stat: plain number card from code. explanation: a manager agent's text. host_reason: why the group screen shows this. table: league table. tag: player name tag on the pitch. summary: a manager's half-time or full-time summary, on their phone. recap_ready: link to the recap video. clash: on a close call, the two competing pitches on the group screen until verdict_at, then the verdict (#89). lost_screen: on a phone, the manager's moment lost the group screen to winner (#89).",
+      "enum": ["stat", "explanation", "host_reason", "table", "tag", "summary", "recap_ready", "clash", "lost_screen"]
+    },
+    "source": { "enum": ["code", "scorer", "host", "manager", "fallback"]},
+    "payload": {
+      "type": "object",
+      "required": ["headline"],
+      "additionalProperties": false,
+      "properties": {
+        "headline": { "type": "string", "maxLength": 80},
+        "body": { "type": "string", "maxLength": 280},
+        "body_en": { "type": "string", "maxLength": 280},
+        "lang": { "$ref": "common.schema.json#/$defs/lang" },
+        "style": { "$ref": "common.schema.json#/$defs/style" },
+        "body_source": {
+          "description": "On a group explanation card: who wrote its body, the winner's pitch. manager (an agent) or code (#138). The cue's source says who decided the screen, not who wrote the line.",
+          "enum": ["manager", "code"]
+        },
+        "manager": { "$ref": "common.schema.json#/$defs/managerId" },
+        "player": { "$ref": "common.schema.json#/$defs/playerId" },
+        "evidence": {
+          "description": "Shown in the analyst evidence drawer.",
+          "type": "array",
+          "items": { "$ref": "common.schema.json#/$defs/evidence" }
+        },
+        "table": {
+          "type": "array",
+          "maxItems": 5,
+          "items": {
+            "type": "object",
+            "required": ["manager", "points", "rank"],
+            "additionalProperties": false,
+            "properties": {
+              "manager": { "$ref": "common.schema.json#/$defs/managerId" },
+              "points": { "type": "number" },
+              "rank": { "type": "integer", "minimum": 1, "maximum": 5},
+              "delta": { "type": "number" }
+            }
+          }
+        },
+        "rulebook": {
+          "description": "League rulebook entries a summary relies on, retrieved from the Foundry IQ knowledge base (#18).",
+          "type": "array",
+          "maxItems": 5,
+          "items": {
+            "type": "object",
+            "required": ["id", "title"],
+            "additionalProperties": false,
+            "properties": { "id": { "type": "string", "pattern": "^[a-z0-9-]{1,64}$" }, "title": { "type": "string", "maxLength": 80}}
+          }
+        },
+        "recap_url": { "type": "string", "format": "uri" },
+        "contenders": {
+          "description": "The two pitches the group screen shows on a close call before the verdict (#89). On a clash cue only.",
+          "type": "array",
+          "minItems": 2,
+          "maxItems": 2,
+          "items": {
+            "type": "object",
+            "required": ["manager", "pitch"],
+            "additionalProperties": false,
+            "properties": {
+              "manager": { "$ref": "common.schema.json#/$defs/managerId" },
+              "pitch": { "type": "string", "maxLength": 140, "minLength": 1},
+              "pitch_source": { "description": "Who wrote the pitch: manager (the agent) or code (#138).", "enum": ["manager", "code"]},
+              "angle": { "$ref": "common.schema.json#/$defs/factId" }
+            }
+          }
+        },
+        "verdict_at": {
+          "description": "Match time at which a clash cue switches from the two pitches to the verdict. Not later than expires_at.",
+          "$ref": "common.schema.json#/$defs/matchTimeMs"
+        },
+        "winner": {
+          "description": "Whose moment the group screen showed: on a clash cue, the host's pick shown after verdict_at; on a lost_screen cue, the manager who took the screen (never the phone's own manager).",
+          "$ref": "common.schema.json#/$defs/managerId"
+        }
+      }
+    }
+  },
+  "allOf": [
+    { "if": { "properties": { "kind": { "const": "table" }}}, "then": { "properties": { "payload": { "required": ["table"]}}}},
+    {
+      "if": { "properties": { "kind": { "const": "recap_ready" }}},
+      "then": { "properties": { "payload": { "required": ["recap_url"]}}}
+    },
+    { "if": { "properties": { "kind": { "const": "tag" }}}, "then": { "properties": { "payload": { "required": ["player"]}}}},
+    {
+      "if": { "properties": { "kind": { "const": "clash" }}},
+      "then": { "properties": { "screen": { "const": "group" }, "payload": { "required": ["contenders", "verdict_at", "winner"]}}}
+    },
+    {
+      "if": { "properties": { "kind": { "const": "lost_screen" }}},
+      "then": { "properties": { "screen": { "pattern": "^phone:mgr_[1-5]$" }, "payload": { "required": ["winner"]}}}
+    }
+  ]
+}

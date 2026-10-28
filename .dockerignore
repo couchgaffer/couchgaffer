@@ -1,0 +1,14 @@
+**
+!backend/pyproject.toml
+!backend/uv.lock
+!backend/.python-version
+!backend/watchparty/
+!backend/tools/
+!contracts/examples/
+!frontend/package.json
+!frontend/package-lock.json
+!frontend/tsconfig.json
+!frontend/vite.config.ts
+!frontend/index.html
+!frontend/src/
+**/__pycache__

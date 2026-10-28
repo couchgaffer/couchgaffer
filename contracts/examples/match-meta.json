@@ -1,0 +1,46 @@
+{
+  "match_id": "match_demo_01",
+  "seed": 1,
+  "speed": 30,
+  "playback_delay_ms": 5000,
+  "home": {
+    "id": "t_hollinsford",
+    "name": "Hollinsford United",
+    "short_name": "HOL",
+    "colour": "#1f5fbf",
+    "formation": "4-3-3",
+    "players": [
+      { "id": "p_home_1", "name": "Tom Ashcombe", "shirt": 1, "position": "GK" },
+      { "id": "p_home_2", "name": "Reece Holloway", "shirt": 2, "position": "DEF" },
+      { "id": "p_home_3", "name": "Joel Okonta", "shirt": 4, "position": "DEF" },
+      { "id": "p_home_4", "name": "Mateus Varela", "shirt": 5, "position": "DEF" },
+      { "id": "p_home_5", "name": "Callum Bryer", "shirt": 3, "position": "DEF" },
+      { "id": "p_home_6", "name": "Kwame Adomako", "shirt": 6, "position": "MID" },
+      { "id": "p_home_7", "name": "Ollie Fenwick", "shirt": 8, "position": "MID" },
+      { "id": "p_home_8", "name": "Rafael Dunmore", "shirt": 10, "position": "MID" },
+      { "id": "p_home_9", "name": "Jonah Pryce", "shirt": 9, "position": "FWD" },
+      { "id": "p_home_10", "name": "Tayo Brennan", "shirt": 7, "position": "FWD" },
+      { "id": "p_home_11", "name": "Luca Ferrante", "shirt": 11, "position": "FWD" }
+    ]
+  },
+  "away": {
+    "id": "t_saltmere",
+    "name": "Saltmere Rovers",
+    "short_name": "SAL",
+    "colour": "#b8322a",
+    "formation": "4-2-3-1",
+    "players": [
+      { "id": "p_away_1", "name": "Rhys Mallory", "shirt": 1, "position": "GK" },
+      { "id": "p_away_2", "name": "Danny Oduya", "shirt": 2, "position": "DEF" },
+      { "id": "p_away_3", "name": "Lasse Vikholm", "shirt": 5, "position": "DEF" },
+      { "id": "p_away_4", "name": "Marcus Eyre", "shirt": 6, "position": "DEF" },
+      { "id": "p_away_5", "name": "Theo Langford", "shirt": 3, "position": "DEF" },
+      { "id": "p_away_6", "name": "Ade Fashola", "shirt": 4, "position": "MID" },
+      { "id": "p_away_7", "name": "Conor Blythe", "shirt": 8, "position": "MID" },
+      { "id": "p_away_8", "name": "Elliot Marsden", "shirt": 10, "position": "MID" },
+      { "id": "p_away_9", "name": "Dylan Crossfield", "shirt": 9, "position": "FWD" },
+      { "id": "p_away_10", "name": "Malik Tennant", "shirt": 7, "position": "MID" },
+      { "id": "p_away_11", "name": "Jules Ravier", "shirt": 11, "position": "FWD" }
+    ]
+  }
+}

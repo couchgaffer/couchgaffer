@@ -1,0 +1,17 @@
+.DS_Store
+.env
+.env.*
+!.env.example
+.venv/
+__pycache__/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+node_modules/
+frontend/dist/
+
+# MCP client config with a session token (docs/mcp.md)
+.vscode/mcp.json
+
+# Recorded sessions and local recap renders (docker compose run recap)
+recordings/

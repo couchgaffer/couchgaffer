@@ -1,0 +1,38 @@
+{
+  "moment_id": "m_07",
+  "t": 2534000,
+  "chosen_manager": "mgr_1",
+  "source": "host",
+  "close_call": true,
+  "because": "most_close_calls_lost",
+  "reason": "Close call. You have been overruled twice; your keeper's save takes the screen.",
+  "contenders": [
+    {
+      "manager": "mgr_2",
+      "pitch": "Priya's keeper reaches the Wall tier.",
+      "angle": "f_m_07_mgr_2_differential"
+    },
+    {
+      "manager": "mgr_1",
+      "pitch": "Jo's captain saved, one off the bonus.",
+      "angle": "f_m_07_mgr_1_captain"
+    }
+  ],
+  "scores": [
+    {
+      "manager": "mgr_2",
+      "score": 0.82,
+      "airtime_share": 0.4,
+      "overruled_count": 0,
+      "angle": "f_m_07_mgr_2_differential"
+    },
+    {
+      "manager": "mgr_1",
+      "score": 0.78,
+      "airtime_share": 0.1,
+      "overruled_count": 2,
+      "angle": "f_m_07_mgr_1_captain"
+    }
+  ],
+  "latency_ms": 1650
+}

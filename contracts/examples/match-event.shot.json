@@ -1,0 +1,6 @@
+{
+  "seq": 412, "t": 2534000, "type": "shot", "team": "home", "player": "p_home_9",
+  "x": 0.88, "y": 0.41, "outcome": "saved", "opponent": "p_away_1",
+  "shot": { "xg": 0.31, "speed_km_h": 104, "body_part": "right_foot" },
+  "moment_id": "m_07", "climax": true, "scenario": "counterattack"
+}

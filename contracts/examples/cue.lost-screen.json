@@ -1,0 +1,16 @@
+{
+  "cue_id": "c_32",
+  "seq": 32,
+  "screen": "phone:mgr_2",
+  "moment_id": "m_07",
+  "show_at": 2534000,
+  "min_dwell_ms": 0,
+  "expires_at": 2720000,
+  "kind": "lost_screen",
+  "source": "host",
+  "payload": {
+    "headline": "Shown on your phone",
+    "body": "The screen went to Jo: his captain's save.",
+    "winner": "mgr_1"
+  }
+}
