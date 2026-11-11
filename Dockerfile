@@ -7,7 +7,7 @@ RUN npm ci --ignore-scripts
 COPY frontend/ ./
 RUN npm run build
 
-FROM python:3.12-slim AS build
+FROM python:3.15-slim AS build
 COPY --from=ghcr.io/astral-sh/uv:0.10.6 /uv /usr/local/bin/uv
 ENV UV_COMPILE_BYTECODE=1 UV_LINK_MODE=copy UV_PYTHON_DOWNLOADS=never
 WORKDIR /app
@@ -20,7 +20,7 @@ RUN uv sync --locked --no-dev --no-editable
 FROM build AS recap-build
 RUN uv sync --locked --no-dev --group recap --no-editable
 
-FROM python:3.12-slim AS recap
+FROM python:3.15-slim AS recap
 RUN apt-get update && apt-get install -y --no-install-recommends ffmpeg fonts-dejavu-core \
     && rm -rf /var/lib/apt/lists/* && useradd --system --uid 10001 --no-create-home app
 WORKDIR /app
@@ -30,7 +30,7 @@ USER 10001
 CMD ["python", "-m", "watchparty.recap.worker"]
 
 # The app: the default target, so it stays last.
-FROM python:3.12-slim
+FROM python:3.15-slim
 RUN useradd --system --uid 10001 --no-create-home app
 WORKDIR /app
 COPY --from=build /app/.venv ./.venv
