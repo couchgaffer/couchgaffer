@@ -4,13 +4,13 @@ A mini-league watch party. Five friends in one fantasy league watch the same mat
 
 All match data is synthetic: the clubs, players, managers and the match itself are invented and generated in code.
 
-**Try it:** https://couchgaffer.com. No sign-in. A gameweek or a single match takes about three minutes.
+**Try it:** the hosted demo has been taken down. Watch the [demo video](https://youtu.be/mqcNfxjUg1o), or [run it locally](#run-it-locally); a gameweek or a single match takes about three minutes.
 
 Built from 20 Oct 2026 in a private repository; the full development history is available to the organisers on request.
 
 ## Testing instructions
 
-1. Open the link and choose **Watch now**. Its three steps pick your manager (the other four are bots), your phone (casual or analyst, and a language) and the match; each has a default ("A gameweek: three matches at once", the demo match), so you can press **Start the watch party** straight away. For one match instead, choose "A single match" in the third step.
+1. Start the app ([Run it locally](#run-it-locally)), open http://127.0.0.1:8000 and choose **Watch now**. Its three steps pick your manager (the other four are bots), your phone (casual or analyst, and a language) and the match; each has a default ("A gameweek: three matches at once", the demo match), so you can press **Start the watch party** straight away. For one match instead, choose "A single match" in the third step.
 2. The group screen plays the gameweek at 30 times real speed: three matches on one clock, one league table for all of them. The screen shows the match of the card on screen, and the top bar shows all three scores, the one on the big screen marked with a dot. On a phone, tap a score to follow that match there. When something matters to a friend, their agent writes a line for their phone and a one-line pitch to the host.
 3. Open **Phone and tools** at the top right: scan its QR code to follow your manager on your own phone, or use the phone in it.
 4. Watch for a close call: two friends' agents both have a strong case. Whether one comes depends on the agents' bids, so a run may have none. The group screen gives way to their two pitches side by side, then the verdict (with the host's reason when the host decided), then the chosen moment. The friend who lost the screen gets a note on their phone.
